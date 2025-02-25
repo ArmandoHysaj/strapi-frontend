@@ -6,7 +6,6 @@ import { Footer } from "@/components/custom/Footer";
 
 export async function generateMetadata(): Promise<Metadata> {
   const metadata = await getGlobalPageMetadata();
-  console.log("metadata------", metadata.title);
   return {
     title: metadata?.data.title,
     description: metadata?.data.description,
