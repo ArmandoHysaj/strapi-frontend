@@ -15,7 +15,6 @@ function blockRenderer(block: any) {
 
 export default async function Home() {
   const strapiData = await getHomePageData();
-  console.log(strapiData);
   const { blocks } = strapiData.data;
   if (!blocks) return <div>No blocks found</div>;
   return <main>{blocks.map((block: any) => blockRenderer(block))}</main>;
