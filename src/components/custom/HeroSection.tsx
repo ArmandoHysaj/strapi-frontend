@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { StrapiImage } from "./StrapiImage";
+import { getUserMeLoader } from "@/data/services/getUserMeLoader";
 interface ImageProps {
   id: number;
   url: string;
@@ -21,9 +22,10 @@ interface HeroSectionProps {
     link: LinkProps[];
   };
 }
-export function HeroSection({ data }: Readonly<HeroSectionProps>) {
-  console.dir(data, { depth: null });
+export async function HeroSection({ data }: Readonly<HeroSectionProps>) {
   const { heading, subHeading, image, link } = data;
+  const user = await getUserMeLoader();
+  const linkUrl = user.ok ? "/dashboard" : link[0].url;
   return (
     <header className="relative h-[600px] overflow-hidden">
       <StrapiImage
@@ -40,9 +42,9 @@ export function HeroSection({ data }: Readonly<HeroSectionProps>) {
         <p className="mt-4 text-lg md:text-xl lg:text-2xl">{subHeading}</p>
         <Link
           className="mt-8 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-black bg-white rounded-md shadow hover:bg-gray-100"
-          href={link[0].url}
+          href={linkUrl}
         >
-          {link[0].text}
+          {user.ok ? "Go to dashboard" : link[0].text}
         </Link>
       </div>
     </header>

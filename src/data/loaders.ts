@@ -1,6 +1,5 @@
 import qs from "qs";
 import { getStrapiURL } from "@/lib/utils";
-import { unstable_noStore as noStore } from "next/cache";
 
 const baseUrl = getStrapiURL();
 
@@ -55,7 +54,6 @@ export async function getHomePageData() {
 }
 
 export async function getGlobalPageData() {
-  noStore();
   const url = new URL("/api/global", baseUrl);
   url.search = qs.stringify({
     populate: [
