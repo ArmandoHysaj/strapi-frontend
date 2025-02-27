@@ -4,9 +4,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { cn, extractYouTubeID } from "@/lib/utils";
 
-import { Input } from "@/components/ui/input";
-import { SubmitButton } from "../custom/SubmitButton";
 import { generateSummaryService } from "@/data/services/summary-service";
+import { createSummaryAction } from "@/data/actions/summary-actions";
+
+import { Input } from "@/components/ui/input";
+import { SubmitButton } from "@/components/custom/SubmitButton";
 
 interface StrapiErrorsProps {
   message: string | null;
@@ -26,10 +28,12 @@ export function SummaryForm() {
   async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
+
     const formData = new FormData(event.currentTarget);
     const videoId = formData.get("videoId") as string;
 
     const processedVideoId = extractYouTubeID(videoId);
+
     if (!processedVideoId) {
       toast.error("Invalid Youtube Video ID");
       setLoading(false);
@@ -41,8 +45,49 @@ export function SummaryForm() {
       });
       return;
     }
+
     const summaryResponseData = await generateSummaryService(videoId);
-    console.log(summaryResponseData, "Response from route handler");
+    console.log(
+      summaryResponseData,
+      processedVideoId,
+      "Response from route handlerxx"
+    );
+
+    if (summaryResponseData.error) {
+      setValue("");
+      toast.error(summaryResponseData.error);
+      setError({
+        ...INITIAL_STATE,
+        message: summaryResponseData.error,
+        name: "Summary Error",
+      });
+      setLoading(false);
+      return;
+    }
+
+    const payload = {
+      data: {
+        title: `Summary for video: ${processedVideoId}`,
+        videoId: processedVideoId,
+        summary: summaryResponseData.data,
+      },
+    };
+
+    try {
+      const summaryCall = await createSummaryAction(payload);
+      console.log("summary call-----------------", summaryCall);
+    } catch (error) {
+      console.log(error, "-----------ERRORRRR-------");
+      toast.error("Failed to create summary");
+      setError({
+        ...INITIAL_STATE,
+        message: "Failed to create summary",
+        name: "Summary Error",
+      });
+      setLoading(false);
+      return;
+    }
+
     toast.success("Summary Created");
     setLoading(false);
   }

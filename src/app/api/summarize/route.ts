@@ -1,3 +1,4 @@
+"use server";
 import { NextRequest } from "next/server";
 
 import { ChatOpenAI } from "@langchain/openai";
@@ -55,6 +56,10 @@ async function generateSummary(content: string, template: string) {
 
   try {
     const summary = await chain.invoke({ text: content });
+    if (!summary || typeof summary !== "string") {
+      throw new Error("Invalid summary response from AI.");
+    }
+    console.log("Generated Summary:", summary);
     return summary;
   } catch (error) {
     if (error instanceof Error)
